@@ -69,7 +69,7 @@ class Paras():
         
         if self.ec_operators == None:
             if self.method == 'eoh':
-                self.ec_operators  = ['e1','e2','m1','m2']
+                self.ec_operators  = ['e1','e2','m1','m2', 'm3']
             elif self.method == 'ael':
                 self.ec_operators  = ['crossover','mutation']
             elif self.method == 'ls':

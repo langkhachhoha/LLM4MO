@@ -3,15 +3,12 @@ import random
 from codebleu import calc_codebleu
 
 def ast_similarity(code1, code2):
-    """Calculate AST-based similarity using CodeBLEU."""
     return calc_codebleu([code1], [code2], lang="python", weights=(0.25, 0.25, 0.25, 0.25), tokenizer=None)['codebleu']
 
 def dominates(ind1, ind2):
-    """Check if ind1 Pareto dominates ind2."""
     return all(x <= y for x, y in zip(ind1, ind2)) and any(x < y for x, y in zip(ind1, ind2))
 
 def compute_dissimilarity(pop):
-    """Compute AST-based dissimilarity matrix."""
     N = len(pop)
     S = np.zeros((N, N))
     for i in range(N):
@@ -21,7 +18,6 @@ def compute_dissimilarity(pop):
     return S
 
 def compute_dominance_mask(pop):
-    """Compute dominance mask matrix."""
     N = len(pop)
     D = np.zeros((N, N))
     for i in range(N):

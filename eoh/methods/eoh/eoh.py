@@ -72,9 +72,6 @@ class EOH:
 
         time_start = time.time()
 
-        # interface for large language model (llm)
-        # interface_llm = PromptLLMs(self.api_endpoint,self.api_key,self.llm_model,self.debug_mode)
-
         # interface for evaluation
         interface_prob = self.prob
 
@@ -118,23 +115,7 @@ class EOH:
                     json.dump(population, f, indent=5)
                 n_start = 0
 
-        # main loop
-        n_op = len(self.operators)
-
         for pop in range(n_start, self.n_pop):     
-            # for i in range(n_op):
-            #     op = self.operators[i]
-            #     print(f" OP: {op}, [{i + 1} / {n_op}] ", end="|") 
-            #     op_w = self.operator_weights[i]
-            #     if (np.random.rand() < op_w):
-            #         parents, offsprings = interface_ec.get_algorithm(population, op)
-            #     self.add2pop(population, offsprings)  # Check duplication, and add the new offspring
-            #     for off in offsprings:
-            #         print(" Obj: ", [obj.item() for obj in off['objective']] if off['objective'] is not None else None, end="|")
-            #     # populatin management
-            #     size_act = min(len(population), self.pop_size)
-            #     population = self.manage.population_management(population, size_act)
-            #     print()
             parents, offsprings = interface_ec.get_algorithm(population, self.operators)
             self.add2pop(population, offsprings)  # Check duplication, and add the new offspring
             size_act = min(len(population), self.pop_size)
