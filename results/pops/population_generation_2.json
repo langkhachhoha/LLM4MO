@@ -1,0 +1,92 @@
+[
+     {
+          "algorithm": "\nA novel algorithm is proposed where in each step, the next node is selected based on the node that has the minimum average of the sum of distances in the two distance matrices to the current node, while ensuring that the node has not been visited before and is not the destination node.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_avg_distance = np.inf\n    next_node = None\n    for node in unvisited_nodes:\n        if node != destination_node:\n            avg_distance = (distance_matrix_1[current_node][node] + distance_matrix_2[current_node][node]) / 2\n            if avg_distance < min_avg_distance:\n                min_avg_distance = avg_distance\n                next_node = node\n    return next_node",
+          "objective": [
+               11.35096,
+               12.48721
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nDesign an algorithm that selects the next node based on the combination of the minimum total distance from the current node to unvisited nodes in both distance matrices, while also considering the ratio of distances between the current node and unvisited nodes in the two matrices as a tiebreaker if multiple nodes have the same total distance.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_total_distance = float('inf')\n    next_node = None\n    \n    for node in unvisited_nodes:\n        total_distance = distance_matrix_1[current_node][node] + distance_matrix_2[current_node][node]\n        if total_distance < min_total_distance:\n            min_total_distance = total_distance\n            next_node = node\n        elif total_distance == min_total_distance:\n            ratio_mat1 = distance_matrix_1[current_node][node] / distance_matrix_1[current_node][destination_node]\n            ratio_mat2 = distance_matrix_2[current_node][node] / distance_matrix_2[current_node][destination_node]\n            if (ratio_mat1 + ratio_mat2) < 1:\n                min_total_distance = total_distance\n                next_node = node\n    \n    return next_node",
+          "objective": [
+               11.35096,
+               12.48721
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nPropose a novel algorithm that selects the next node based on the combined criteria of distance from the current node to the destination node and average of the two distance matrices.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_cost = np.inf\n    next_node = None\n    \n    for node in unvisited_nodes:\n        cost = distance_matrix_1[current_node][node] + distance_matrix_1[node][destination_node] + (distance_matrix_1[node].mean() + distance_matrix_2[node].mean()) / 2\n        if cost < min_cost:\n            min_cost = cost\n            next_node = node\n    \n    return next_node",
+          "objective": [
+               8.52656,
+               26.0255
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nProposed algorithm: At each step, select the next node based on the combination of minimum distances from the current node in both distance matrices, with a preference for nodes that are closer in both matrices. Start by calculating the sum of distances to unvisited nodes in both matrices from the current node, then choose the node with the smallest sum distance. If multiple nodes have the same minimum sum distance, prioritize the node that has the smallest individual distance in the first matrix, then in the second matrix.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_sum_distance = float('inf')\n    next_node = None\n    \n    for node in unvisited_nodes:\n        sum_distance = distance_matrix_1[current_node][node] + distance_matrix_2[current_node][node]\n        \n        if sum_distance < min_sum_distance:\n            min_sum_distance = sum_distance\n            next_node = node\n        elif sum_distance == min_sum_distance:\n            if distance_matrix_1[current_node][node] < distance_matrix_1[current_node][next_node]:\n                next_node = node\n            elif distance_matrix_1[current_node][node] == distance_matrix_1[current_node][next_node]:\n                if distance_matrix_2[current_node][node] < distance_matrix_2[current_node][next_node]:\n                    next_node = node\n\n    return next_node",
+          "objective": [
+               11.35096,
+               12.48721
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm randomly selects the next node from the unvisited nodes, while ensuring that the sum of the distances from the current node to the potential next node in both distance matrices is minimized.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_sum_distance = np.inf\n    next_node = None\n    \n    for node in unvisited_nodes:\n        dist_sum = distance_matrix_1[current_node][node] + distance_matrix_2[current_node][node]\n        if dist_sum < min_sum_distance:\n            min_sum_distance = dist_sum\n            next_node = node\n    \n    return next_node",
+          "objective": [
+               11.35096,
+               12.48721
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nProposed algorithm: At each step, calculate the sum of the corresponding values in both distance matrices for each unvisited node and select the node with the lowest sum as the next node to visit.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_sum = np.inf\n    next_node = None\n    \n    for node in unvisited_nodes:\n        node_sum = distance_matrix_1[current_node][node] + distance_matrix_2[current_node][node]\n        if node_sum < min_sum:\n            min_sum = node_sum\n            next_node = node\n            \n    return next_node",
+          "objective": [
+               11.35096,
+               12.48721
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe new algorithm selects the next node based on a scoring function that combines the distance from the current node to the potential next node in distance matrix 1 and the distance from the potential next node to the destination node in distance matrix 2, with weights assigned to each metric.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_score = np.inf\n    next_node = None\n    \n    for node in unvisited_nodes:\n        score = 0.7 * distance_matrix_1[current_node][node] + 0.3 * distance_matrix_2[node][destination_node]\n        if score < min_score:\n            min_score = score\n            next_node = node\n    \n    return next_node",
+          "objective": [
+               8.62207,
+               23.95702
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\"The algorithm selects the next node by calculating the sum of distances from the current node to unvisited nodes in both distance matrices, then normalizes the distances based on the maximum distance in each matrix, and finally selects the node with the smallest sum of normalized distances.\"",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_normalized_distance = np.inf\n    next_node = None\n    \n    for node in unvisited_nodes:\n        total_distance = distance_matrix_1[current_node][node] + distance_matrix_2[current_node][node]\n        max_distance_mat1 = np.max(distance_matrix_1)\n        max_distance_mat2 = np.max(distance_matrix_2)\n        \n        normalized_distance_mat1 = distance_matrix_1[current_node][node] / max_distance_mat1\n        normalized_distance_mat2 = distance_matrix_2[current_node][node] / max_distance_mat2\n        \n        sum_normalized_distance = normalized_distance_mat1 + normalized_distance_mat2\n        \n        if sum_normalized_distance < min_normalized_distance:\n            min_normalized_distance = sum_normalized_distance\n            next_node = node\n    \n    return next_node",
+          "objective": [
+               11.76846,
+               12.27001
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nThe algorithm selects the next node based on the node that minimizes the product of the corresponding distances in the two distance matrices to the current node and the destination node.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_cost = np.inf\n    next_node = None\n    \n    for node in unvisited_nodes:\n        cost = distance_matrix_1[current_node][node] * distance_matrix_2[node][destination_node]\n        if cost < min_cost:\n            min_cost = cost\n            next_node = node\n    \n    return next_node",
+          "objective": [
+               9.12185,
+               24.34592
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nPropose a novel algorithm that selects the next node based on the combined criteria of distance from the current node to the destination node, maximum of the two distance matrices, and the difference between the diagonal elements of the two distance matrices.\n",
+          "code": "import numpy as np\n\ndef select_next_node(current_node, destination_node, unvisited_nodes, distance_matrix_1, distance_matrix_2):\n    min_cost = np.inf\n    next_node = None\n    \n    for node in unvisited_nodes:\n        cost = distance_matrix_1[current_node][node] + distance_matrix_1[node][destination_node] + max(distance_matrix_1[node].max(), distance_matrix_2[node].max()) + abs(distance_matrix_1[node][node] - distance_matrix_2[node][node])\n        if cost < min_cost:\n            min_cost = cost\n            next_node = node\n    \n    return next_node",
+          "objective": [
+               9.54325,
+               26.48526
+          ],
+          "other_inf": null
+     }
+]
