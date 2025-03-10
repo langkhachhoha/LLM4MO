@@ -1,0 +1,34 @@
+def select_next_node_v1(current_node: int, destination_node: int, unvisited_nodes: set, 
+                          distance_matrix_1: np.ndarray, distance_matrix_2: np.ndarray) -> int:
+    """Select the next node to visit from the unvisited nodes for a two-objective TSP."""
+    # Coefficients for score computation (you may adjust these coefficients as needed)
+    c1, c2, c3, c4 = 0.4, 0.3, 0.2, 0.1
+    # Weights for combining objectives (default equally weighted)
+    w1, w2 = 0.5, 0.5
+    
+    scores = {}
+    for node in unvisited_nodes:
+        # For objective 1:
+        all_distances_1 = [distance_matrix_1[node][i] for i in unvisited_nodes if i != node]
+        avg_distance_1 = np.mean(all_distances_1)
+        std_distance_1 = np.std(all_distances_1)
+        score1 = (c1 * distance_matrix_1[current_node][node] - 
+                  c2 * avg_distance_1 + 
+                  c3 * std_distance_1 - 
+                  c4 * distance_matrix_1[destination_node][node])
+        
+        # For objective 2:
+        all_distances_2 = [distance_matrix_2[node][i] for i in unvisited_nodes if i != node]
+        avg_distance_2 = np.mean(all_distances_2)
+        std_distance_2 = np.std(all_distances_2)
+        score2 = (c1 * distance_matrix_2[current_node][node] - 
+                  c2 * avg_distance_2 + 
+                  c3 * std_distance_2 - 
+                  c4 * distance_matrix_2[destination_node][node])
+        
+        # Combine the two scores using weighted sum
+        combined_score = w1 * score1 + w2 * score2
+        scores[node] = combined_score
+        
+    next_node = min(scores, key=scores.get)
+    return next_node

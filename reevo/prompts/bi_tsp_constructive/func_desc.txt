@@ -1,0 +1,1 @@
+The select_next_node function takes as input the current node, the destination node, a set of unvisited nodes, and two distance matrices (one for the first objective and one for the second objective). It returns the next node to visit.

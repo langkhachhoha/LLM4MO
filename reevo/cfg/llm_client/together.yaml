@@ -1,0 +1,5 @@
+_target_: utils.llm_client.together.TogetherClient
+
+model: meta-llama/Llama-3.3-70B-Instruct-Turbo # LLM model
+temperature: 1.0  # temperature for chat completion
+api_key: Insert_your_API_key_here
