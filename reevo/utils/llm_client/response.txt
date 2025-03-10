@@ -1,0 +1,690 @@
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray, alpha: float = 0.5, beta: float = 0.5) -> np.ndarray:
+    """
+    Heuristics function for TSP that combines factors to determine the promise of selecting an edge.
+
+    Args:
+    - distance_matrix (np.ndarray): Matrix representing the distances between nodes.
+    - alpha (float, optional): Factor weighting theromise based on distance. Defaults to 0.5.
+    - beta (float, optional): Factor weighting the promise based on node degrees. Defaults to 0.5.
+
+    Returns:
+    - np.ndarray: Matrix of the same shape as the input, with values indicating the promise of selecting each edge.
+    """
+
+    # Calculate the promise based on distance
+    distance_promise = 1 / (distance_matrix + np.finfo(float).eps)  # Add epsilon to avoid division by zero
+
+    # Calculate the node degrees (i.e., the sum of distances to all other nodes)
+    node_degrees = np.sum(distance_matrix, axis=0)  # Degrees of the nodes in the columns
+    node_degrees_matrix = np.repeat(node_degrees[np.newaxis, :], distance_matrix.shape[0], axis=0)
+
+    # Calculate the promise based on node degrees
+    node_degree_promise = 1 / (node_degrees_matrix + np.finfo(float).eps)  # Use the transpose to match the input shape
+
+    # Calculate the promise based on a combination of distance and node degrees
+    promise = alpha * distance_promise + beta * node_degree_promise.T
+
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.percentile(promise, 25)  # Set elements below the 25th percentile to zero
+    promise[promise < threshold] = 0
+
+    return promise
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Compute prior indicators of how promising it is to include each edge in a TSP solution.
+    
+    The score for each edge is a combination of its proximity (shorter edges are more promising), 
+    its centrality (edges connecting nodes with many neighbors are more promising), and its relative 
+    importance compared to other edges emanating from the same nodes.
+    
+    Sparsification is performed by only considering the top K% most promising edges for each node.
+    """
+    num_nodes = distance_matrix.shape[0]
+    
+    # Proximity factor: shorter edges are more promising
+    proximity_factor = 1 / distance_matrix
+    
+    # Centrality factor: edges connecting nodes with many neighbors are more promising
+    centrality_factor = np_degrees = np.sum(1 / (distance_matrix + 1e-6), axis=1, keepdims=True)
+    centrality_factor = np_degrees + np_degrees.T
+    
+    # Relative importance factor: edges that are significantly shorter than others emanating from the same nodes
+    relative_importance_factor = np_reserve = np_min_distance = np.min(distance_matrix, axis=1, keepdims=True)
+    relative_importance_factor = np_reserve / (distance_matrix + 1e-6)
+    
+    # Combine factors
+    scores = proximity_factor * centrality_factor * relative_importance_factor
+    
+    # Sparsify the matrix by only considering the top K% most promising edges for each node
+    k = 20
+    threshold = npIntegerField = np.sort(scores, axis=1)[:, int(num_nodes * k / 100):1]
+    threshold = np_maximum(threshold, axis=1, keepdims=True)
+    sparse_scores = np.where(scores > threshold, scores, 0)
+    
+    return sparse_scores
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Compute a heuristic that estimates the desirability of each edge in the solution.
+
+    This version of the heuristic combines the reciprocal distance with a factor that 
+    prefers shorter distances and a sparseUSAGE factor to sparsify the results.
+    """
+    n_nodes = distance_matrix.shape[0]
+
+    # Compute a weighted sum of the distances to each node
+    node_split_heuristic = (1 / (n_nodes * distance_matrix)) @ np.ones(n_nodes)
+
+    # Sparse the returned matrix
+    max_distance = distance_matrix.max()
+    sparse_matrix = np.where(distance_matrix > 0.75 * max_distance, 0, 1 / distance_matrix)
+
+    # Combine the reciprocal of the distance with node_split_heuristic
+    combined_heuristic = (0.7 * sparse_matrix) + (0.3 * (node_split_heuristic * np.ones((n_nodes, n_nodes))))
+
+    return combined_heuristic
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    # Calculate the normalized distance (edge length)
+    normalized_distance = distance_matrix / np.max(distance_matrix)
+    
+    # Calculate the ranking of each edge
+    rankings = np.zeros_like(distance_matrix)
+    for i in range(rankings.shape[0]):
+        for j in range(rankings.shape[1]):
+            rankings[i, j] = np.sum(distance_matrix[:, j] < distance_matrix[i, j])
+    
+    # Normalize the ranking
+    normalized_ranking = rankings / np.max(rankings)
+    
+    # Combine factors
+    combined_heuristics = (1 / normalized_distance) * (1 - normalized_ranking)
+    
+    # Sparsify the matrix by setting unpromising elements to zero
+    sparse_heuristics = np.where(combiment_heuristics > np.mean(combined_heuristics), combined_heuristics, 0)
+    
+    return sparse_heuristics
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    # Calculate the solely inverse distance heuristic
+    inv_distance = 1 / distance_matrix
+    
+    # Calculate the normalized distance heuristic
+    normalized_distance = distance_matrix / np.sum(distance_matrix, axis=1, keepdims=True)
+    
+    # Calculate the proximity heuristic
+    max_distance = np.max(distance_matrix)
+    proximity = 1 - (distance_matrix / max_distance)
+    
+    # Combine the heuristics
+    combined_heuristic = inv_distance * normalized_distance * proximity
+    
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.mean(combined_heuristic)  # Set threshold as the mean of the heuristic values
+    sparse_heuristic = np.where(combined_heuristic > threshold, combined_heuristic, 0)
+    
+    return sparse_heuristic
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray, alpha: float = 0.5, beta: float = 0.5, sparse_threshold: float = 0.5) -> np.ndarray:
+    """
+    A heuristic function for solving TSP by combining various factors and sparsifying the matrix.
+    
+    Parameters:
+    distance_matrix (np.ndarray): The input distance matrix.
+    alpha (float): The weight for the inverse distance factor. Default is 0.5.
+    beta (float): The weight for the random noise factor. Default is 0.5.
+    sparse_threshold (float): The threshold for sparsifying the matrix. Default is 0.5.
+    
+    Returns:
+    np.ndarray: A matrix with the same shape as the input distance matrix, where each element represents the prior indicator of how promising it is to include the corresponding edge in a solution.
+    """
+    
+    # Calculate the inverse distance factor
+    inverse_distance_factor = 1 / distance_matrix
+    
+    # Introduce some random noise to the heuristic
+    random_noise_factor = np.random.rand(*distance_matrix.shape)
+    
+    # Combine the inverse distance factor and the random noise factor
+    combined_factor = alpha * inverse_distance_factor + beta * random_noise_factor
+    
+    # Sparsify the matrix by setting elements below the threshold to zero
+    sparsified_factor = np.where(combined_factor > sparse_threshold, combined_factor, 0)
+    
+    # Normalize the sparsified factor to ensure it sums up to 1
+    normalized_factor = sparsified_factor / np.sum(sparsified_factor)
+    
+    return normalized_factor
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    This function calculates heuristics for solving Traveling Salesman Problem (TSP).
+    It combines multiple factors to determine the promise of each edge and sparsifies the matrix.
+
+    Parameters:
+    distance_matrix (np.ndarray): A square matrix where each entry (i, j) represents the distance between node i and node j.
+
+    Returns:
+    np.ndarray: A matrix of the same shape as the input, where each entry represents the promise of the corresponding edge.
+    """
+
+    # Calculate the shortest distance from each node to all other nodes
+    shortest_distance = np.min(distance_matrix, axis=1)
+
+    # Calculate a factor based on the shortest distance
+    shortest_distance_factor = 1 / (shortest_distance[:, np.newaxis] + distance_matrix)
+
+    # Calculate a factor based on the proximity of nodes to the center of the graph
+    center = np.mean(np.argwhere(np.ones_like(distance_matrix())), axis=0)
+    center_factor = 1 / (np.abs(np.arange(distance_matrix.shape[0]) - center[0])[:, np.newaxis] + 1) + 1 / (np.abs(np.arange(distance_matrix.shape[0]) - center[0]))
+    center_factor = center_factor[:, np.newaxis] + center_factor
+
+    # Calculate a factor based on the variance of distances for each node
+    variance_factor = 1 / (np.var(distance_matrix, axis=1)[:, np.newaxis] + np.var(distance_matrix, axis=0))
+
+    # Combine the factors
+    promise = shortest_distance_factor * center_factor * variance_factor
+
+    # Apply a sigmoid function to ensure the values are between 0 and 1
+    promise = 1 / (1 + np.exp(-promise))
+
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = 0.5
+    promise[promise < threshold] = 0
+
+    return promise
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Heuristics function for Solving Traveling Salesman Problem (TSP) by combining various factors.
+    
+    Parameters:
+    distance_matrix (np.ndarray): A square matrix where the entry at row i and column j represents the distance from node i to node j.
+    
+    Returns:
+    np.ndarray: A matrix of the same shape as the input distance matrix, where each entry represents a prior indicator of how promising it is to include the corresponding edge in a solution.
+    """
+
+    # Calculate the inverse of the distance matrix as a basic heuristic
+    inverse_distance = 1 / distance_matrix
+    
+    # Calculate the degree of each node (number of edges connected to it) as a factor
+    degrees = np.sum(distance_matrix != 0, axis=0)
+    
+    # Calculate the clustering coefficient of each node as another factor
+    clustering_coefficients = np.zeros_like(degrees)
+    for i in range(len(degrees)):
+        neighborhood = np.where(distance_matrix[i] != 0)[0]
+        if len(neighborhood) < 2:
+            clustering_coefficients[i] = 0
+        else:
+            neighborhood_matrix = distance_matrix[np.ix_(neighborhood, neighborhood)]
+            num_edges = np.sum(neighborhood_matrix != 0) / 2
+            clustering_coefficients[i] = num_edges / (len(neighborhood) * (len(neighborhood) - 1) / 2)
+    
+    # Combine the factors using a weighted sum
+    heuristic = inverse_distance * 0.6 + (degrees ** (-1))[:, None] * 0.2 + clustering_coefficients[:, None] * 0.2
+    
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.mean(heuristic) + np.std(heuristic)
+    heuristic[heuristic < threshold] = 0
+    
+    return heuristic
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Heuristics function for TSP via stochastic solution sampling.
+    
+    Parameters:
+    distance_matrix (np.ndarray): A 2D array where distance_matrix[i, j] is the distance from node i to node j.
+    
+    Returns:
+    np.ndarray: A 2D array where each entry is a prior indicator of how promising it is to include the corresponding edge in a solution.
+    """
+    
+    # Inverse distance: shorter distances are more promising
+    inverse_distance = 1 / distance_matrix
+    
+    # Minimum distances for each node: edges connected to nodes with smaller minimum distances are more promising
+    min_distances = np.min(distance_matrix, axis=1)
+    min_distance_matrix = min_distances[:, np.newaxis] + min_distances[np.newaxis, :]
+    
+    # Combine inverse distance and minimum distance factors
+    combined_factors = inverse_distance * (1 / min_distance_matrix)
+    
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.median(combined_factors)
+    sparse_matrix = np.where(combined_factors > threshold, combined_factors, 0)
+    
+    # Normalize the sparse matrix to ensure that the indicators are comparable
+    normalized_matrix = sparse_matrix / np.sum(sparse_matrix, axis=None)
+    
+    return normalized_matrix
+
+# Example usage:
+distance_matrix = np.array([
+    [0, 10, 15, 20],
+    [10, 0, 35, 25],
+    [15, 35, 0, 30],
+    [20, 25, 30, 0]
+])
+
+heuristics_indicators = heuristics_v2(distance_matrix)
+print(heuristics_indicators)
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    This function calculates the prior indicators of how promising it is to include each edge in a solution
+    for the Traveling Salesman Problem (TSP) using a combination of factors and sparsifying the matrix.
+    
+    Parameters:
+    distance_matrix (np.ndarray): A 2D matrix where the entry at row i and column j represents the distance between node i and node j.
+    
+    Returns:
+    np.ndarray: A 2D matrix of the same shape as the input matrix, where each entry represents the prior indicator of how promising it is to include the corresponding edge in a solution.
+    """
+    
+    # Calculate the inverse of the distance matrix
+    inverse_distance_matrix = 1 / distance_matrix
+    
+    # Calculate the average distance from each node to all other nodes
+    average_distances = np.mean(distance_matrix, axis=1, keepdims=True)
+    
+    # Calculate the multiplier for each edge based on its distance and the average distance from its nodes
+    multiplier = 1 / (1 + (distance_matrix / average_distances) + (distance_matrix / average_distances.T))
+    
+    # Combine the inverse distance and the multiplier to get the prior indicators
+    prior_indicators = inverse_distance_matrix * multiplier
+    
+    # Sparsify the matrix by setting unpromising elements to zero
+    sparsity_threshold = 0.5
+    prior_indicators[prior_indicators < sparsity_threshold] = 0
+    
+    return prior_indicators
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Heuristics function for solving Traveling Salesman Problem (TSP) via stochastic solution sampling.
+    
+    This function combines various factors to determine how promising it is to select an edge.
+    It also sparsifies the matrix by setting unpromising elements to zero.
+    
+    Parameters:
+    distance_matrix (np.ndarray): A 2D array where the element at the i-th row and j-th column represents the distance between the i-th and j-th nodes.
+    
+    Returns:
+    np.ndarray: A 2D array of the same shape as the input distance_matrix, representing the heuristics values.
+    """
+    
+    # Calculate the inverse of the distance matrix as the primary heuristics
+    primary_heuristics = 1 / distance_matrix
+    
+    # Calculate the minimum distance from each node to all other nodes
+    min_distance = np.min(distance_matrix, axis=1, keepdims=True)
+    
+    # Reward edges that connect to nodes with smaller minimum distances
+    min_distance_heuristics = 1 / (1 + np.abs(distance_matrix - min_distance))
+    
+    # Calculate the variance of distances for each node
+    variance = np.var(distance_matrix, axis=1, keepdims=True)
+    
+    # Penalize edges that connect to nodes with large variance in distances
+    variance_heuristics = 1 / (1 + variance)
+    
+    # Combine the primary heuristics with the minimum distance heuristics and variance heuristics
+    combined_heuristics = primary_heuristics * min_distance_heuristics * variance_heuristics
+    
+    # Sparsify the matrix by thresholding
+    threshold = np.quantile(combined_heuristics, 0.25)
+    sparse_heuristics = np.where(combined_heuristics > threshold, combined_heuristics, 0)
+    
+    return sparse_heuristics
+
+# Test the function
+if __name__ == "__main__":
+    distance_matrix = np.random.rand(10, 10)
+    heuristics_values = heuristics_v2(distance_matrix)
+    print(heuristics_values)
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Heuristics function for Solving Traveling Salesman Problem (TSP) via stochastic solution sampling.
+    
+    This function takes as input a distance matrix and returns prior indicators of how promising it is to include each edge in a solution.
+    
+    The return is of the same shape as the input.
+    """
+    
+    # Compute the inverse of the distance matrix as the base heuristic
+    base_heuristic = 1 / distance_matrix
+    
+    # Compute the row-wise magnitude of the distance matrix as an indicator of node centrality
+    row_magnitude = np.sum(distance_matrix, axis=1)
+    
+    # Compute the column-wise magnitude of the distance matrix as an indicator of node centrality
+    col_magnitude = np.sum(distance_matrix, axis=0)
+    
+    # Combine the row-wise and column-wise magnitudes as a node centrality indicator
+    centrality_indicator = np.outer(row_magnitude, col_magnitude)
+    
+    # Combine the base heuristic and the centrality indicator
+    combined_heuristic = base_heuristic * (1 / (centrality_indicator + 1e-6))
+    
+    # Sparsify the combined heuristic matrix by setting the smallest values to zero
+    threshold = np.mean(combined_heuristic)  # threshold as the mean of the combined heuristic
+    sparse_heuristic = np.where(combined_heuristic > threshold, combined_heuristic, 0)
+    
+    return sparse_heuristic
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    A heuristic function for Solving Traveling Salesman Problem (TSP) via stochastic solution sampling.
+    
+    This function takes a distance matrix as input and returns a matrix of prior indicators of how promising it is to include each edge in a solution.
+    
+    The return matrix is of the same shape as the input distance matrix.
+    """
+    
+    # Calculate the inverse of the distance matrix to favor shorter edges
+    inverse_distance = 1 / distance_matrix
+    
+    # Calculate the minimum distance for each node to favor edges connected to nodes with shorter minimum distances
+    min_distance = np.min(distance_matrix, axis=1)
+    min_distance_matrix = np.minimum(min_distance[:, np.newaxis], min_distance[np.newaxis, :])
+    
+    # Combine the inverse distance and minimum distance factors
+    combined_factors = inverse_distance * min_distance_matrix
+    
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.median(combined_factors)
+    sparsified_matrix = np.where(combined_factors > threshold, combined_factors, 0)
+    
+    return sparsified_matrix
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    # Calculate the min and max distances
+    min_distance = np.min(distance_matrix)
+    max_distance = np.max(distance_matrix)
+
+    # Normalize the distances
+    normalized_distances = (distance_matrix - min_distance) / (max_distance - min_distance)
+
+    # Calculate the inverse of the normalized distances
+    inverse_distances = 1 / (normalized_distances + 1e-6)  # Avoid division by zero
+
+    # Calculate the harmonic mean of the inverse distances
+    harmonic_mean_inverse_distances = 2 / (1 / inverse_distances + 1)
+
+    # Calculate the mean and standard deviation of the inverse distances
+    mean_inverse_distance = np.mean(inverse_distances)
+    std_inverse_distance = np.std(inverse_distances)
+
+    # Calculate the z-scores of the inverse distances
+    z_scores = (inverse_distances - mean_inverse_distance) / (std_inverse_distance + 1e-6)
+
+    # Combine the factors to determine the promise of each edge
+    promise = (harmonic_mean_inverse_distances + z_scores) / 2
+
+    # Sparsify the matrix by setting unpromising elements to zero
+   VERY_UNPROMISING = -2.5
+    promise = np.where(z_scores < VERY_UNPROMISING, 0, promise)
+
+    return promise
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Heuristics function for Solving Traveling Salesman Problem (TSP) via stochastic solution sampling.
+    
+    This function calculates prior indicators of how promising it is to include each edge in a solution.
+    The indicators are based on a combination of factors: the reciprocal of the distance, 
+    the difference between the average distance and the current distance, and the variance of the distances.
+
+    Parameters:
+    distance_matrix (np.ndarray): A 2D array representing the distances between nodes.
+
+    Returns:
+    np.ndarray: A 2D array of the same shape as the input, representing the prior indicators.
+    """
+
+    # Calculate the reciprocal of the distance
+    reciprocal_distance = 1 / distance_matrix
+
+    # Calculate the average distance for each node
+    avg_distance_per_node = np.mean(distance_matrix, axis=1, keepdims=True)
+
+    # Calculate the difference between the average distance and the current distance
+    avg_distance_diff = avg_distance_per_node - distance_matrix
+
+    # Calculate the variance of the distances for each node
+    variance_per_node = np.var(distance_matrix, axis=1, keepdims=True)
+
+    # Calculate the standardized difference between the average distance and the current distance
+    standardized_diff = (avg_distance_diff - np.mean(avg_distance_diff)) / np.std(avg_distance_diff)
+
+    # Calculate the prior indicators by combining the factors
+    prior_indicators = (0.4 * reciprocal_distance) + (0.3 * standardized_diff) + (0.3 * (1 / variance_per_node))
+
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.percentile(prior_indicators, 25)
+    prior_indicators[prior_indicators < threshold] = 0
+
+    return prior_indicators
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    A heuristic function for solving the Traveling Salesman Problem (TSP) via stochastic solution sampling.
+    
+    This function takes a distance matrix as input and returns a matrix of prior indicators of how promising it is to include each edge in a solution.
+    
+    The returned matrix has the same shape as the input distance matrix.
+    """
+    
+    # Calculate the inverse of the distance matrix to prioritize shorter edges
+    inverse_distance = 1 / distance_matrix
+    
+    # Calculate the minimum distance from each node to all other nodes
+    min_distance = np.min(distance_matrix, axis=1)
+    
+    # Calculate the normalized minimum distance for each node
+    normalized_min_distance = min_distance / np.max(min_distance)
+    
+    # Calculate the column-wise and row-wise mean of the distance matrix
+    col_mean = np.mean(distance_matrix, axis=0)
+    row_mean = np.mean(distance_matrix, axis=1)
+    
+    # Calculate the harmonic mean of the distance matrix
+    harmonic_mean = 2 * col_mean * row_mean / (col_mean + row_mean)
+    
+    # Combine the inverse distance, normalized minimum distance, and harmonic mean to determine the Promise of each edge
+    promise = inverse_distance * (1 + normalized_min_distance[:, None] + normalized_min_distance[None, :]) / (1 + harmonic_mean[:, None] + harmonic_mean[None, :])
+    
+    # Sparsify the promise matrix by setting unpromising elements to zero
+    threshold = np.percentile(promise, 20)
+    promise[promise < threshold] = 0
+    
+    return promise
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    This function calculates prior indicators of how promising it is to include each edge in a solution.
+    
+    The indicators are calculated based on the following heuristics:
+    1. Proximity: Edges with shorter distances are more likely to be included.
+    2. Degree: Edges connected to nodes with higher degrees are more likely to be included.
+    
+    To encourage sparsity, the indicators of edges with distances larger than the median distance are reduced.
+    """
+    
+    # Calculate the proximity heuristic
+    proximity = 1 / (distance_matrix + 1e-6)  # Add a small value to avoid division by zero
+    
+    # Calculate the degree heuristic
+    degrees = np.sum(distance_matrix != 0, axis=0)
+    degree_heuristic = degrees[None, :] * degrees[:, None]
+    
+    # Calculate the combined heuristic
+    combined_heuristic = proximity * degree_heuristic
+    
+    # Calculate the median distance
+    median_distance = np.median(distance_matrix)
+    
+    # Apply the sparsity heuristic
+    sparsity_heuristic = np.where(distance_matrix > median_distance, 0.1, 1)
+    
+    # Calculate the final heuristic
+    final_heuristic = combined_heuristic * sparsity_heuristic
+    
+    return final_heuristic
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    This function calculates prior indicators of how promising it is to include each edge in a solution for the Traveling Salesman Problem (TSP).
+    
+    Parameters:
+    distance_matrix (np.ndarray): A 2D array where the element at index [i, j] represents the distance between node i and node j.
+    
+    Returns:
+    np.ndarray: A 2D array of the same shape as the input distance_matrix, where each element represents the prior indicator of its corresponding edge.
+    """
+    
+    # Calculate the upper triangular matrix to avoid duplicate edges
+    upper_triangular_mask = np.triu(np.ones_like(distance_matrix, dtype='bool'))
+    
+    # Calculate the inverse of the distance matrix as the base heuristic value
+    base_heuristic = 1 / distance_matrix
+    
+    # Introduce a beta factor to discourage long edges
+    beta = 2
+    distance_factor = np.exp(-beta * distance_matrix / np.max(distance_matrix))
+    
+    # Introduce an additional factor to penalize edges that do not contribute to good initial route construction
+    # Here, we calculate the ratio of each edge's distance to the average distance of edges connected to the same node
+    node_degrees = np.sum(upper_triangular_mask, axis=1, keepdims=True)
+    average_distance_per_node = np.sum(distance_matrix * upper_triangular_mask, axis=1, keepdims=True) / node_degrees
+    relative_distance_factor = 1 / (1 + distance_matrix / average_distance_per_node)
+    
+    # Combine the base heuristic and the factors using element-wise multiplication
+    heuristics = base_heuristic * distance_factor * relative_distance_factor
+    
+    # Sparsify the matrix by setting unpromising elements (i.e., where heuristics is less than 1% of the maximum) to zero
+    threshold = 0.01 * np.max(heuristics)
+    sparsity_mask = heuristics < threshold
+    heuristics[sparsity_mask] = 0
+    
+    return heuristics
+```
+```python
+import numpy as np
+
+def heuristics_v1(distance_matrix: np.ndarray) -> np.ndarray:
+    return 1 / distance_matrix
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    """
+    Heuristics function for Solving Traveling Salesman Problem (TSP) via stochastic solution sampling.
+    
+    This function combines various factors to determine how promising it is to select an edge.
+    It also sparsifies the matrix by setting unpromising elements to zero.
+    
+    Parameters!:
+    distance_matrix (np.ndarray): A 2D numpy array representing the distance between each pair of nodes.
+    
+    Returns:
+    np.ndarray: A 2D numpy array of the same shape as the input, where each element represents the prior indicator of how promising it is to include the corresponding edge in a solution.
+    """
+    # Calculate the average distance to get a sense of the scale
+    avg_distance = np.mean(distance_matrix)
+    
+    # Calculate the inverse of the distance matrix to encourage shorter edges
+    inverse_distance = 1 / (distance_matrix + 1e-8)  # Add a small value to avoid division by zero
+    
+    # Calculate the rank of each edge based on its distance
+    ranks = np.argsort(np.argsort(distance_matrix, axis=1), axis=1)
+    
+    # Combine the factors using a weighted sum
+    heuristics = 0.5 * inverse_distance + 0.3 * (1 / (ranks + 1)) + 0.2 * (1 / (distance_matrix / avg_distance + 1))
+    
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.percentile(heuristics, 25)
+    heuristics[heuristics < threshold] = 0
+    
+    return heuristics
+
+# Example usage
+distance_matrix = np.array([[0, 10, 15, 20], [10, 0, 35, 25], [15, 35, 0, 30], [20, 25, 30, 0]])
+heuristics_score = heuristics_v2(distance_matrix)
+print(heuristics_score)
+```
+```python
+import numpy as np
+
+def heuristics_v2(distance_matrix: np.ndarray) -> np.ndarray:
+    # Compute a score for each edge based on its length and the degree of its nodes
+    num_nodes = distance_matrix.shape[0]
+    degree = np.sum(distance_matrix != 0, axis=0)
+    score = 1 / (distance_matrix + 1e-6) * (1 / (degree[:, None] + 1e-6)) * (1 / (degree[None, :] + 1e-6))
+
+    # Sparsify the matrix by setting unpromising elements to zero
+    threshold = np.percentile(score score, 25)
+    score[score < threshold] = 0
+
+    # Set the diagonal elements to zero since they represent self-loops
+    np.fill_diagonal(score, 0)
+
+    return score
+```

@@ -1,0 +1,2 @@
+- Try look-ahead mechanisms.
+- Try computing a weighted sum of the distances from the current node to each candidate node using both provided distance matrices. This approach helps balance the trade-offs between the two objectives.

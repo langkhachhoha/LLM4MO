@@ -1,0 +1,7 @@
+problem_name: bi_tsp_constructive
+problem_type: constructive
+obj_type: min
+problem_size: 50
+func_name: select_next_node
+num_objectives: 2
+description: Solving Bi-objective Traveling Salesman Problem (Bi-TSP) with constructive heuristics. In Bi-TSP, each node is defined by two distinct coordinates corresponding to two different spaces or objectives. The task is to find a tour that visits all nodes and returns to the starting point.

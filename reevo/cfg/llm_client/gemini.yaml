@@ -1,0 +1,5 @@
+_target_: utils.llm_client.gemini.GeminiClient
+
+model: gemini/gemini-1.5-pro # LLM model
+temperature: 1.0  # temperature for chat completion
+api_key: Insert_your_API_key_here

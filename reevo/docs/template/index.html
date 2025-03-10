@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+
+{% set require_hljs = page.enable_code_highlight and code %}
+{% set enable_preview = preview_mode and preview_mode.enabled %}
+{% set title = '['+paper.conference+'] '+paper.title %}
+<head>
+  <meta charset="utf-8">
+
+  {% if metadata %}
+    <!-- See The Open Graph protocol https://ogp.me/ for details -->
+    <meta property="og:url" content="{{page.url}}">
+    <meta property="og:title" content="{{paper.title}}">
+    <meta name="twitter:title" content="{{title}}">
+    {%if metadata.description%}
+      <meta name="description" content="{{metadata.description}}">
+      <meta property="og:description" content="{{metadata.description}}">
+      <meta name="twitter:description" content="{{metadata.description}}">
+    {%endif%}
+    {%if metadata.keywords%}
+      <meta name="keywords" content="{{metadata.keywords | join(', ')}}">
+    {%endif%}
+    {% if metadata.banner_image %}
+      <meta property="og:image" content="{{metadata.banner_image}}">
+      <meta name="twitter:image" content="{{metadata.twitter_banner_image | default(metadata.banner_image)}}">
+      <meta name="twitter:card" content="{{metadata.twitter_large_image | default(metadata.banner_image)}}">
+    {% endif %}
+  {% endif %}
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  <link rel="icon" type="image/svg" href='static/icon.svg'/>
+
+  <!-- preconnect -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  {%if poster %}
+    <link rel="preconnect" href="https://documentcloud.adobe.com" crossorigin />
+    <link rel="prefetch" href="{{poster.url}}" />
+  {%endif%}
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  {%if require_hljs %}<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />{%endif%}
+  <link rel="preload" href="static/index.css" as="style">
+  {%if paper.logo%}
+    <link rel="preload" href="{{paper.logo.src}}" as="image" />
+  {%endif%}
+  
+  <!-- bulma -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" integrity="sha256-WLKGWSIJYerRN8tbNGtXWVYnUM5wMJTXD8eG4NtGcDM=" crossorigin="anonymous">
+  
+  {%if carousel%}
+    {%for item in carousel%}<link rel="preload" href="{{item.image}}" as="image"/>{%endfor%}
+    <!-- carousel -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.autoplay.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/carousel/carousel.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.36/dist/fancybox/fancybox.min.css">
+  {%endif%}
+
+  <!-- custom scripts -->
+  <link rel="stylesheet" href="static/index.css">
+
+  <!-- clipboard -->
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha256-4XodgW4TwIJuDtf+v6vDJ39FVxI0veC/kSCCmnFp7ck=" crossorigin="anonymous"></script>
+
+  {%if poster %}
+    <!-- PDF reader -->
+    <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  {%endif%}
+
+  <!-- icons -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/js/all.min.js" integrity="sha256-gSqw5G+Gss6YqyQlqyIkuQ0IRZUqGsDVq9c0tiF+mL8=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/fontawesome.min.css" integrity="sha256-BYjRZhSY2ARUPcFTf5eEh3qWK58O88TM7nZet/JUNhE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- custom font -->
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  {%if require_hljs %}
+    <!-- Syntax highlighting for code cells -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    {%for lang in page.required_languages %}
+      <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/{{lang}}.min.js"></script>
+    {%endfor%}
+  {%endif%}
+
+  {%if page.enable_katex %}
+    <!-- Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+      integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+      integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+      crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+      integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+      onload="renderMathInElement(document.body);"></script>
+  {%endif%}
+
+  {%if page.tracking and not enable_preview %}
+    {%if page.tracking.type == "umami"%}
+      {% set enable_umami = true %}
+      <script defer src="https://cloud.umami.is/script.js" data-website-id="{{page.tracking.website_id}}"></script>
+    {%endif%}
+  {%endif%}
+</head>
+
+<body>
+  <!-- header -->
+  <section class="hero" id="title">
+    <div class="hero-body">
+      <div class="container is-max-desktop" style="max-width:1200px">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-2 publication-title">{{paper.title}}</h1>
+            <div class="is-size-5 publication-authors">
+              <!-- Paper authors -->
+              {% for author in paper.authors %}
+              <span class="author-block">
+                {%- if author.link %}
+                  <a href="{{author.link}}" target="_blank"
+                    {% if enable_umami %}data-umami-event="click-link:{{author.name}}"{%endif%}
+                  >{{author.name}}</a>
+                {%- else %}{{author.name}}
+                {%- endif %}
+                {%- if author.symbols %}<sup>{{author.symbols}}</sup>{%-endif-%}
+                {%- if not loop.last -%},{%-endif-%}
+              </span>
+              {% endfor %}
+            </div>
+
+            <div class="is-size-6 publication-authors">
+              {% for inst in paper.institutions %}
+              <span class="author-block" style="margin-right:.5em">
+                <sup>{{inst.symbol}} </sup>
+                {%- if inst.link %}
+                  <a 
+                    href="{{inst.link}}" target="_blank"
+                    {% if enable_umami %}data-umami-event="click-link:{{inst.name}}"{%endif%}
+                  >{{inst.name}}</a>
+                {%- else %}{{inst.name}}
+                {%- endif -%}
+              </span>{%- if loop.first %}<br />{%endif%}
+              {%endfor%}<br />
+              <b class="author-block is-size-5" style="padding:1ex 0">{{paper.conference}}</b>
+              {%for note in paper.notes %}
+              <span class="eql-cntrb"><br><sup>{{note.symbol}}</sup>{{note.message}}</span>
+              {%endfor%}
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                {% for key, item in links | items %}
+                <span class="link-block">
+                  <a href="{{item.link}}" target="_blank" 
+                    class="external-link button is-normal is-rounded is-dark" 
+                    {% if enable_umami %}data-umami-event="click-link:{{key}}"{%endif%}
+                  >
+                    <span class="icon">
+                      {%-if item.icon.class %}<i class="{{item.icon.class}}"></i>
+                      {%-elif item.icon.html %}{{item.icon.html}}
+                      {%-endif%}</span>
+                    <span>{{item.caption | default(key)}}</span>
+                  </a>
+                </span>
+                {% endfor %}
+              </div>
+            </div>
+            {%-if teaser %}<div class="column has-text-centered is-size-5"><b>{{teaser.content}}</b></div>{%endif%}
+            {%-if paper.logo %}<img src="{{paper.logo.src}}" alt="{{paper.logo.alt}}" width="{{paper.logo.width|default('128px')}}"/>{%endif%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% set blockcount = 0 %}
+  {%-if paper.abstract-%}
+  <!-- Paper abstract -->
+  <section class="section hero red-link {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="abstract">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>{{paper.abstract}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End paper abstract -->
+  {%endif%}
+
+  {%-if carousel-%}
+  <!-- Image carousel -->
+  <section class="hero is-small {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="carousel">
+    <div class="hero-body">
+      <div class="container">
+        <div class="f-carousel" id="paper-carousel">
+          {%for item in carousel%}
+          <div class="f-carousel__slide carousel-slide">
+            <div>
+              <a href="{{item.image}}" data-fancybox="carousel-1" data-caption="{{item.description|escape}}">
+                <img src="{{item.image}}" alt="{{item.alt_text|default(item.description)|escape}}" />
+              </a>
+              <h2 class="subtitle has-text-centered" style="margin-top:1ex">
+                {{item.description}}
+              </h2>
+            </div>
+          </div>
+          {%endfor%}
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End image carousel -->
+  {%-endif-%}
+
+  {%if code%}
+  <!-- Code Cell with syntax highlighting + copy to clipboard -->
+  <section class="section hero red-link {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="usage">
+    <div class="container is-max-desktop content" style="width:100%">
+      <h2 class="title">Usage 🔑</h2>
+      {%for item in code%}
+      <h3>{{item.title}}</h3>
+      {%if item.code%}
+      <div class="code-container">
+        <pre><code class="code-content language-{{item.language}}" style="background-color:white" id="code-content-{{loop.index}}">
+          {{-item.code-}}
+        </code></pre>
+        {%if item.copy_button%}
+        <button class="copy-button" alt="Copy to clipboard" data-clipboard-target="#code-content-bibtex">
+          <span class="copy-icon before-copy"><i class="fa fa-copy"></i></span>
+          <span class="copy-icon after-copy"><i class="fas fa-check"></i></span>
+        </button>
+        {%endif%}
+      </div>
+      {%endif%}
+      {%if item.description%}
+      <p class="content">{{item.description}}</p>
+      {%endif%}
+      {%endfor%}
+    </div>
+  </section>
+  <!-- End code cell -->
+  {%endif%}
+
+  {%if poster%}
+  <!-- Paper poster -->
+  <section class="hero is-small {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="poster">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title">Poster</h2>
+        <iframe src="{{poster.url}}" width="100%" height="800"></iframe>
+      </div>
+    </div>
+  </section>
+  <!--End paper poster -->
+  {%endif%}
+
+  {%if citation%}
+  <!-- BibText citation + copy to clipboard -->
+  <section class="section {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="citation">
+    <div class="container is-max-desktop content">
+      <h2 class="title">Citation 🤩</h2>
+      <div class="code-container">
+        <pre><code class="code-content language-text" id="code-content-bibtex">{{citation.biblatex}}</code></pre>
+        {%if citation.copy_button%}
+        <button 
+          class="copy-button" alt="Copy to clipboard" 
+          data-clipboard-target="#code-content-bibtex"
+          {% if enable_umami %}data-umami-event="copy-citation"{%endif%}
+        >
+          <span class="copy-icon before-copy"><i class="fa fa-copy"></i></span>
+          <span class="copy-icon after-copy"><i class="fas fa-check"></i></span>
+        </button>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  <!--End BibTex citation -->
+  {%endif%}
+
+  {%-if news-%}
+  <section class="section hero red-link {%if blockcount%2==0%}is-light{%endif%}{%set blockcount=blockcount+1%}" id="news">
+    <div class="container is-max-desktop content"style="width:100%">
+      <h2 class="title">News 📰</h2>
+      <div class="has-text-justified">
+        <table><tbody>
+        {%for item in news.contents%}
+        <tr>
+          <th>{{item.date}}</th>
+          <td>{{item.content}}</td>
+        </tr>
+        {%endfor%}
+        </tbody></table>
+      </div>
+    </div>
+  </section>
+  {%endif%}
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/ai4co/research-project-page-template"
+                target="_blank">Research Project Page Template</a> which is based on
+              the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic
+                Project Page Template</a> and the
+              <a href="https://nerfies.github.io" target="_blank">Nerfies project page</a>. You are free to borrow the
+              of this website, we just ask that you link back to this page in the footer.
+              This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"
+                target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if(hljs){hljs.highlightAll();}
+  if(ClipboardJS){
+    let clipboard = new ClipboardJS('.copy-button');
+    let enter_count = 0;
+
+    clipboard.on('success', function(e){
+      e.clearSelection();
+      const element = e.trigger;
+      if(enter_count===0){element.classList.add('copied');}
+      enter_count++;
+      setTimeout(function(){
+        enter_count--;
+        if(enter_count===0){element.classList.remove('copied');}
+      }, 2000);
+    });
+  }
+  if(Carousel){
+    const container = document.getElementById("paper-carousel");
+    const options = {Autoplay: { timeout: 4000, }};
+    const carousel = new Carousel(container, options, { Autoplay });
+  }
+  if(Fancybox){Fancybox.bind("[data-fancybox]", {})}
+});
+</script>
+{% if enable_preview %}
+<script> // script for live reload
+(function(){
+  let last_updated = new Date();
+  const dummy_file_path="/{{preview_mode.dummy_file_path}}";
+  function refresh_on_change(){
+    fetch(dummy_file_path).then(function(res){
+      const last_modified = new Date(res.headers.get("Last-Modified"));
+      if(last_updated<last_modified){window.location.reload()}
+    })
+  }
+  setInterval(refresh_on_change, 1000);
+})();
+</script>
+{%endif%}
+</body>
+
+</html>
