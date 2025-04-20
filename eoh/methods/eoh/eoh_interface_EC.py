@@ -27,11 +27,7 @@ class InterfaceEC():
         self.timeout = timeout
         self.use_numba = use_numba
         
-    def code2file(self,code):
-        with open("./ael_alg.py", "w") as file:
-        # Write the code to the file
-            file.write(code)
-        return 
+
     
     def add2pop(self,population,offspring):
         for ind in population:
@@ -127,7 +123,6 @@ class InterfaceEC():
 
         try:
             p, offspring = self._get_alg(pop, operator)
-            # print("Hello", offspring)
             
             if self.use_numba:
                 

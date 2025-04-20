@@ -1,15 +1,26 @@
-
 class GetPrompts():
     def __init__(self):
-        self.prompt_task = "Given a set of nodes, where each node has two sets of 2D coordinates and two corresponding distance matrices, \
-you need to find a route that visits each node exactly once and returns to the starting node while minimizing both cost metrics simultaneously. \
-The task can be solved step-by-step by starting from the current node and iteratively choosing the next node. \
-Help me design a novel algorithm that is different from the algorithms in literature to select the next node in each step."
-        self.prompt_func_name = "select_next_node"
-        self.prompt_func_inputs = ["current_node", "destination_node", "unvisited_nodes", "distance_matrix_1", "distance_matrix_2"]
-        self.prompt_func_outputs = ["next_node"]
-        self.prompt_inout_inf = "'current_node', 'destination_node', 'next_node', and 'unvisited_nodes' are node IDs. 'distance_matrix_1' and 'distance_matrix_2' are the two distance matrices of nodes."
-        self.prompt_other_inf = "All are Numpy arrays."
+        self.prompt_task = "You are solving a Bi-objective Travelling Salesman Problem (bi-TSP), where each node has two different 2D coordinates: \
+(x1, y1) and (x2, y2), representing its position in two objective spaces. The goal is to find a tour visiting each node exactly once and returning \
+to the starting node, while minimizing two objectives simultaneously: the total tour length in each coordinate space. \
+Given an archive of non-dominated solutions, where each solution is a numpy array representing a TSP tour, and its corresponding objective \
+is a tuple of two values (cost in each space), design a heuristic function named 'select_neighbor' that selects one solution from the archive \
+and generates a neighbor solution from it. Do not choose randomly. Instead, think about how to identify a solution that is promising for further  \
+local improvement. Using a novel or creative strategy — not necessarily 2-opt. You can try swap, reinsertion, segment relocation, or invent your own local \
+transformation logic.  The function should return the new neighbor solution."
+
+        self.prompt_func_name = "select_neighbor"
+        self.prompt_func_inputs = ["archive", "instance", "distance_matrix_1", "distance_matrix_2"]
+        self.prompt_func_outputs = ["new_solution"]
+
+        self.prompt_inout_inf = "'archive' is a list of (solution, objective) pairs. \
+Each 'solution' is a numpy array of node IDs. Each 'objective' is a tuple of two float values. \
+'distance_matrix_1' and 'distance_matrix_2' are numpy arrays representing pairwise distances between nodes. \
+'instance' is a numpy array of shape (N, 4), where each row corresponds to a node and contains its coordinates in two 2D spaces: (x1, y1, x2, y2)."
+
+        self.prompt_other_inf = "All inputs are Numpy-compatible."
+
+
 
 
     def get_task(self):

@@ -9,7 +9,7 @@ from .problems import problems
 class EVOL:
 
     # initilization
-    def __init__(self, paras, prob=None, **kwargs):
+    def __init__(self, paras, **kwargs):
 
         print("----------------------------------------- ")
         print("---              Start EoH            ---")
@@ -17,12 +17,8 @@ class EVOL:
         # Create folder #
         createFolders.create_folders(paras.exp_output_path)
         print("- output folder created -")
-
         self.paras = paras
-
         print("-  parameters loaded -")
-
-        self.prob = prob
 
         # Set a random seed
         random.seed(2024)

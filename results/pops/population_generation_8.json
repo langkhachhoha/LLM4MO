@@ -27,20 +27,20 @@
           "other_inf": null
      },
      {
-          "algorithm": "Proposed algorithm: Select a solution with an objective value closest to the median of all objectives from the archive, then perform a reinsertion operation by moving a randomly chosen node to a new position within the tour.",
-          "code": "import numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # {Proposed algorithm: Select a solution with an objective value closest to the median of all objectives from the archive, then perform a reinsertion operation by moving a randomly chosen node to a new position within the tour.}\n    \n    median_objective = np.median([np.mean(obj) for _, obj in archive])\n    selected_solution = min(archive, key=lambda x: abs(sum(x[1]) - median_objective))[0]  # Select solution with objective closest to the median\n    new_solution = selected_solution.copy()\n    \n    # Randomly select a node to reinsert\n    node_to_reinsert = np.random.choice(new_solution)\n    \n    # Remove the selected node from the tour\n    new_solution = np.delete(new_solution, np.where(new_solution == node_to_reinsert))\n    \n    # Choose a random position to insert the node back\n    insert_position = np.random.randint(0, len(new_solution))\n    \n    # Reinsert the node at the chosen position\n    new_solution = np.insert(new_solution, insert_position, node_to_reinsert)\n    \n    return new_solution",
-          "objective": [
-               -1426.83444,
-               1.8738
-          ],
-          "other_inf": null
-     },
-     {
           "algorithm": "Proposed algorithm: Select a solution with the lowest total objective value from the archive, then perform a reinsertion operation by moving a randomly chosen node to a different position in the tour.",
           "code": "import numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # {Proposed algorithm: Select a solution with the lowest total objective value from the archive, then perform a reinsertion operation by moving a randomly chosen node to a different position in the tour.}\n    \n    selected_solution = min(archive, key=lambda x: sum(x[1]))[0]  # Select solution with lowest total objective value\n    new_solution = selected_solution.copy()\n    \n    # Randomly select a node to reinsert\n    node_idx = np.random.choice(len(new_solution))\n    \n    # Randomly select a new position to reinsert the node\n    new_position = np.random.choice([i for i in range(len(new_solution)) if i != node_idx])\n    \n    # Reinsert the selected node at the new position\n    if new_position > node_idx:\n        new_solution = np.concatenate((new_solution[:node_idx], new_solution[node_idx + 1:new_position + 1], [new_solution[node_idx]], new_solution[new_position + 1:]))\n    else:\n        new_solution = np.concatenate((new_solution[:new_position], [new_solution[node_idx]], new_solution[new_position:node_idx], new_solution[node_idx + 1:]))\n    \n    return new_solution",
           "objective": [
                -1407.46641,
                1.5223
+          ],
+          "other_inf": null
+     },
+     {
+          "algorithm": "\nNew Algorithm Description: Select a solution with the lowest sum of objective values from the archive, then perform a reinsertion operation by removing a random node and inserting it at a random position in the tour.\n\n",
+          "code": "import numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # New Algorithm: Select a solution with the lowest sum of objective values from the archive, then perform a reinsertion operation by removing a random node and inserting it at a random position in the tour.\n    \n    selected_solution = min(archive, key=lambda x: sum(x[1]))[0]  # Select solution with the lowest sum of objective values\n    new_solution = selected_solution.copy()\n    \n    # Remove a random node\n    removed_node = np.random.choice(len(new_solution))\n    removed_value = new_solution[removed_node]\n    new_solution = np.delete(new_solution, removed_node)\n    \n    # Insert the removed node at a random position\n    insert_position = np.random.randint(len(new_solution) + 1)\n    new_solution = np.insert(new_solution, insert_position, removed_value)\n    \n    return new_solution",
+          "objective": [
+               -1433.30129,
+               1.52422
           ],
           "other_inf": null
      },
@@ -54,20 +54,20 @@
           "other_inf": null
      },
      {
-          "algorithm": "\nProposed algorithm: Select a solution with the highest combined objective value from the archive, then perform a segment relocation operation by moving a segment of consecutive nodes to a random position within the tour.\n}\n\n```python\nimport numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # Backbone idea: Local transformation of a solution to improve objectives.\n    \n    # {Proposed algorithm: Select a solution with the highest combined objective value from the archive, then perform a segment relocation operation by moving a segment of consecutive nodes to a random position within the tour.",
-          "code": "import numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # Backbone idea: Local transformation of a solution to improve objectives.\n    \n    # {Proposed algorithm: Select a solution with the highest combined objective value from the archive, then perform a segment relocation operation by moving a segment of consecutive nodes to a random position within the tour.}\n    \n    selected_solution = max(archive, key=lambda x: sum(x[1]))[0]  # Select solution with highest combined objective value\n    new_solution = selected_solution.copy()\n    \n    # Randomly select a segment length and starting position\n    segment_length = np.random.randint(2, len(new_solution))\n    start_idx = np.random.randint(0, len(new_solution) - segment_length + 1)\n    \n    # Extract the segment to be relocated\n    segment = new_solution[start_idx:start_idx + segment_length]\n    \n    # Randomly choose a new position to insert the segment\n    new_idx = np.random.randint(0, len(new_solution) - segment_length + 1)\n    \n    # Relocate the segment to the new position\n    new_solution = np.concatenate((new_solution[:new_idx], segment, new_solution[new_idx + segment_length:]))\n    \n    return new_solution",
+          "algorithm": "\nProposed algorithm: Select a solution with the highest total objective value from the archive, then perform a swap operation by swapping the positions of two randomly chosen nodes in the tour.\n}\n\n```python\nimport numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # {Proposed algorithm: Select a solution with the highest total objective value from the archive, then perform a swap operation by swapping the positions of two randomly chosen nodes in the tour.",
+          "code": "import numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # {Proposed algorithm: Select a solution with the highest total objective value from the archive, then perform a swap operation by swapping the positions of two randomly chosen nodes in the tour.}\n    \n    selected_solution = max(archive, key=lambda x: sum(x[1]))[0]  # Select solution with highest total objective value\n    new_solution = selected_solution.copy()\n    \n    # Randomly select two nodes to swap\n    node_idx_1, node_idx_2 = np.random.choice(len(new_solution), 2, replace=False)\n    \n    # Swap the positions of the selected nodes\n    new_solution[node_idx_1], new_solution[node_idx_2] = new_solution[node_idx_2], new_solution[node_idx_1]\n    \n    return new_solution",
           "objective": [
-               -949.63178,
-               1.40072
+               -270.25066,
+               1.32535
           ],
           "other_inf": null
      },
      {
-          "algorithm": "\nNew algorithm: Select a solution with the lowest combined objective value from the archive, then perform a swap operation where two randomly chosen nodes in the tour exchange their positions.\n\n}\n\n```python\nimport numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # Backbone idea: Local transformation of a solution to improve objectives.\n    \n    # {New algorithm: Select a solution with the lowest combined objective value from the archive, then perform a swap operation where two randomly chosen nodes in the tour exchange their positions.",
-          "code": "import numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # Backbone idea: Local transformation of a solution to improve objectives.\n    \n    # {New algorithm: Select a solution with the lowest combined objective value from the archive, then perform a swap operation where two randomly chosen nodes in the tour exchange their positions.}\n    \n    selected_solution = min(archive, key=lambda x: sum(x[1]))[0]  # Select solution with lowest combined objective value\n    new_solution = selected_solution.copy()\n    \n    # Choose two random nodes to swap\n    node_indices = np.random.choice(len(new_solution), 2, replace=False)\n    \n    # Swap the two nodes\n    new_solution[node_indices[0]], new_solution[node_indices[1]] = new_solution[node_indices[1]], new_solution[node_indices[0]]\n    \n    return new_solution",
+          "algorithm": "Proposed algorithm: Select a solution with an objective value closest to the median of all objectives from the archive, then perform a reinsertion operation by moving a randomly chosen node to a new position within the tour.",
+          "code": "import numpy as np\n\ndef select_neighbor(archive, instance, distance_matrix_1, distance_matrix_2):\n    # {Proposed algorithm: Select a solution with an objective value closest to the median of all objectives from the archive, then perform a reinsertion operation by moving a randomly chosen node to a new position within the tour.}\n    \n    median_objective = np.median([np.mean(obj) for _, obj in archive])\n    selected_solution = min(archive, key=lambda x: abs(sum(x[1]) - median_objective))[0]  # Select solution with objective closest to the median\n    new_solution = selected_solution.copy()\n    \n    # Randomly select a node to reinsert\n    node_to_reinsert = np.random.choice(new_solution)\n    \n    # Remove the selected node from the tour\n    new_solution = np.delete(new_solution, np.where(new_solution == node_to_reinsert))\n    \n    # Choose a random position to insert the node back\n    insert_position = np.random.randint(0, len(new_solution))\n    \n    # Reinsert the node at the chosen position\n    new_solution = np.insert(new_solution, insert_position, node_to_reinsert)\n    \n    return new_solution",
           "objective": [
-               -1340.63637,
-               1.58195
+               -1426.83444,
+               1.8738
           ],
           "other_inf": null
      }

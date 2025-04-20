@@ -14,5 +14,7 @@ ttkbootstrap
 google-genai 
 codebleu
 tree-sitter-python
+openai 
+pymoo 
 
 

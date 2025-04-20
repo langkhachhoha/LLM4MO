@@ -3,7 +3,8 @@ import random
 from codebleu import calc_codebleu
 
 def ast_similarity(code1, code2):
-    return calc_codebleu([code1], [code2], lang="python", weights=(0.25, 0.25, 0.25, 0.25), tokenizer=None)['codebleu']
+    return calc_codebleu([code1], [code2], "python")['syntax_match_score']
+
 
 def dominates(ind1, ind2):
     return all(x <= y for x, y in zip(ind1, ind2)) and any(x < y for x, y in zip(ind1, ind2))
@@ -14,7 +15,7 @@ def compute_dissimilarity(pop):
     for i in range(N):
         for j in range(N):
             if i != j:
-                S[i, j] = -ast_similarity(pop[i]['code'], pop[j]['code'])  # Negative for minimization
+                S[i, j] = -ast_similarity(pop[i]['code'], pop[j]['code']) 
     return S
 
 def compute_dominance_mask(pop):

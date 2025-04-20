@@ -2,6 +2,7 @@
 from .selection import prob_rank,equal,roulette_wheel,tournament, AST
 from .management import pop_greedy,ls_greedy,ls_sa, DDS
 
+
 class Methods():
     def __init__(self,paras,problem) -> None:
         self.paras = paras      

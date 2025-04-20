@@ -42,7 +42,7 @@ class Paras():
         #####################
         ###  Evaluation settings  ###
         #####################
-        self.eva_timeout = 30
+        self.eva_timeout = 60
         self.eva_numba_decorator = False
 
 
@@ -56,60 +56,31 @@ class Paras():
     def set_ec(self):    
         
         if self.management == None:
-            if self.method in ['ael','eoh']:
+            if self.method in ['eoh']:
                 self.management = 'DDS'
-            elif self.method == 'ls':
-                self.management = 'ls_greedy'
-            elif self.method == 'sa':
-                self.management = 'ls_sa'
         
         if self.selection == None:
             self.selection = 'AST'
             
-        
         if self.ec_operators == None:
             if self.method == 'eoh':
                 self.ec_operators  = ['e1','e2','m1','m2', 'm3']
-            elif self.method == 'ael':
-                self.ec_operators  = ['crossover','mutation']
-            elif self.method == 'ls':
-                self.ec_operators  = ['m1']
-            elif self.method == 'sa':
-                self.ec_operators  = ['m1']
 
         if self.ec_operator_weights == None:
             self.ec_operator_weights = [1 for _ in range(len(self.ec_operators))]
-        elif len(self.ec_operator) != len(self.ec_operator_weights):
-            print("Warning! Lengths of ec_operator_weights and ec_operator shoud be the same.")
-            self.ec_operator_weights = [1 for _ in range(len(self.ec_operators))]
                     
-        if self.method in ['ls','sa'] and self.ec_pop_size >1:
-            self.ec_pop_size = 1
-            self.exp_n_proc = 1
-            print("> single-point-based, set pop size to 1. ")
             
     def set_evaluation(self):
-        # Initialize evaluation settings
-        if self.problem == 'bp_online':
-            self.eva_timeout = 20
-            self.eva_numba_decorator  = True
-        else:
-            self.eva_timeout = 20
+        self.eva_timeout = 20
                 
     def set_paras(self, *args, **kwargs):
         
-        # Map paras
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
-              
-        # Identify and set parallel 
+
         self.set_parallel()
-        
-        # Initialize method and ec settings
         self.set_ec()
-        
-        # Initialize evaluation settings
         self.set_evaluation()
 
 
@@ -127,6 +98,9 @@ if __name__ == "__main__":
     print(paras_instance.llm_use_local)  # Output: True
     print(paras_instance.llm_local_url)  # Output: http://example.com
     print(paras_instance.ec_pop_size)    # Output: 8
+    import multiprocessing
+    num_processes = multiprocessing.cpu_count()
+    print(f"Number of CPU cores: {num_processes}")
             
             
             

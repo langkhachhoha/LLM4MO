@@ -5,17 +5,19 @@ import types
 import warnings
 from .prompts import GetPrompts
 from .get_instance import GetData
+from pymoo.indicators.hv import HV 
+import random
+import time 
 
 class BITSPCONST():
     def __init__(self) -> None:
         self.ndelay = 1
-        self.problem_size = 50
+        self.problem_size = 100
         self.neighbor_size = np.minimum(self.problem_size,self.problem_size)
-        self.n_instance = 8  
-        self.running_time = 10
-
-
-
+        self.n_instance = 8   
+        self.running_time = 20
+        self.ref_point = np.array([65.0, 65.0])
+        self.ideal_point = np.array([0.0, 0.0])
         self.prompts = GetPrompts()
 
         getData = GetData(self.n_instance,self.problem_size)
@@ -24,8 +26,6 @@ class BITSPCONST():
 
     def tour_cost(self, instance, solution, problem_size):
 
-            # cost_1, cost_2 = self.tour_cost(instance,route,self.problem_size)
-        # print(instance)
         cost_1 = 0
         cost_2 = 0
         
@@ -47,85 +47,49 @@ class BITSPCONST():
         cost_2 += np.linalg.norm(coord_2_last - coord_2_first)
 
         return cost_1, cost_2  
+    
 
-    def generate_neighborhood_matrix(self,instance):
-        instance = np.array(instance)
-        n = len(instance)
-        neighborhood_matrix = np.zeros((n, n), dtype=int)
+    def dominates(self, a, b):
+        """True if a dominates b (minimization)."""
+        return all(x <= y for x, y in zip(a, b)) and any(x < y for x, y in zip(a, b))
 
-        for i in range(n):
-            distances = np.linalg.norm(instance[i] - instance, axis=1)
-            sorted_indices = np.argsort(distances)  # sort indices based on distances
-            neighborhood_matrix[i] = sorted_indices
-
-        return neighborhood_matrix 
+    def random_solution(self):
+        sol = list(range(self.problem_size))
+        random.shuffle(sol)
+        return np.array(sol)
 
 
-    #@func_set_timeout(5)
-    def greedy(self,eva):
 
-        dis_1 = np.ones(self.n_instance)
-        dis_2 = np.ones(self.n_instance)
+    def semo(self,eva):
+
+        obj_1 = np.ones(self.n_instance)
+        obj_2 = np.ones(self.n_instance)
         n_ins = 0
         for instance, distance_matrix_1, distance_matrix_2 in self.instance_data:
-            neighbor_matrix = self.generate_neighborhood_matrix(instance)
+            start = time.time()
+            s = [self.random_solution() for _ in range(10)]
+            Archive = [(s_, self.tour_cost(instance, s_, self.problem_size)) for s_ in s]
+            for _ in range(2000):
+                s_prime = eva.select_neighbor(Archive, instance, distance_matrix_1, distance_matrix_2)
+                f_s_prime = self.tour_cost(instance, s_prime, self.problem_size)
 
-
-            destination_node = 0
-
-            current_node = 0
-
-            route = np.zeros(self.problem_size)
-            for i in range(1,self.problem_size-1):
-
-                near_nodes = neighbor_matrix[current_node][1:]
-
-                mask = ~np.isin(near_nodes,route[:i])
-
-                unvisited_near_nodes = near_nodes[mask]
-
-                unvisited_near_size = np.minimum(self.neighbor_size,unvisited_near_nodes.size)
-
-                unvisited_near_nodes = unvisited_near_nodes[:unvisited_near_size]
-
-                next_node = eva.select_next_node(current_node, destination_node, unvisited_near_nodes, distance_matrix_1, distance_matrix_2)
-
-                if next_node in route:
-                    print("wrong algorithm select duplicate node, retrying ...")
-                    return None
-
-                current_node = next_node
-
-                route[i] = current_node
-
-                #print(">>> Step "+str(i)+": select node "+str(instance[current_node][0])+", "+str(instance[current_node][1]))
-            # print(route)
-
-            mask = ~np.isin(np.arange(self.problem_size),route[:self.problem_size-1])
-
-            last_node = np.arange(self.problem_size)[mask]
-
-            current_node = last_node[0]
-
-            route[self.problem_size-1] = current_node
-
-            #print(">>> Step "+str(self.problem_size-1)+": select node "+str(instance[current_node][0])+", "+str(instance[current_node][1]))
-            cost_1, cost_2 = self.tour_cost(instance,route,self.problem_size)
-
-            dis_1[n_ins] = cost_1
-            dis_2[n_ins] = cost_2
-
+                # Nếu không bị thống trị
+                if not any(self.dominates(f_a, f_s_prime) for _, f_a in Archive):
+                    # Loại bỏ các phần tử bị thống trị bởi f_s_prime
+                    Archive = [(a, f_a) for a, f_a in Archive if not self.dominates(f_s_prime, f_a)]
+                    # Thêm nghiệm mới
+                    Archive.append((s_prime, f_s_prime))
+            end = time.time()
+            objs = np.array([obj for _, obj in Archive])
+            # Tính HV
+            hv_indicator = HV(ref_point=self.ref_point)
+            hv_value = hv_indicator(objs)
+            obj_1[n_ins] = -hv_value
+            obj_2[n_ins] = end - start
             n_ins += 1
-            if n_ins == self.n_instance:
-                break
-            #self.route_plot(instance,route,self.oracle[n_ins])
-
-
-        ave_dis_1 = np.average(dis_1)
-        ave_dis_2 = np.average(dis_2)
-        #print("average dis: ",ave_dis)
-
-        return ave_dis_1, ave_dis_2
+        # Trả về các giá trị mục tiêu
+        return np.mean(obj_1), np.mean(obj_2)
+            
 
 
     def evaluate(self, code_string):
@@ -144,10 +108,9 @@ class BITSPCONST():
                 sys.modules[heuristic_module.__name__] = heuristic_module
 
                 # Now you can use the module as you would any other
-                fitness = self.greedy(heuristic_module)
+                fitness = self.semo(heuristic_module)
                 return fitness
         except Exception as e:
             return None
             
-
 

@@ -1,5 +1,4 @@
 from ..llm.api_general import InterfaceAPI
-from ..llm.api_local_llm import InterfaceLocalLLM
 
 class InterfaceLLM:
     def __init__(self, api_endpoint, api_key, model_LLM,llm_use_local,llm_local_url, debug_mode):
@@ -31,7 +30,6 @@ class InterfaceLLM:
                 exit()
 
             self.interface_llm = InterfaceAPI(
-                self.api_endpoint,
                 self.api_key,
                 self.model_LLM,
                 self.debug_mode,
@@ -44,11 +42,6 @@ class InterfaceLLM:
             print(">> Error in LLM API, wrong endpoint, key, model or local deployment!")
             exit()
 
-        # choose LLMs
-        # if self.type == "API2D-GPT":
-        #     self.interface_llm = InterfaceAPI2D(self.key,self.model_LLM,self.debug_mode)
-        # else:
-        #     print(">>> Wrong LLM type, only API2D-GPT is available! \n")
 
     def get_response(self, prompt_content):
         response = self.interface_llm.get_response(prompt_content)

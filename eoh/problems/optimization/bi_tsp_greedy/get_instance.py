@@ -6,7 +6,7 @@ class GetData():
         self.n_cities = n_cities
 
     def generate_instances(self):
-        # np.random.seed(2024)
+        np.random.seed(2025)
         instance_data = []
         for _ in range(self.n_instance):
             coordinates_1 = np.random.rand(self.n_cities, 2)
