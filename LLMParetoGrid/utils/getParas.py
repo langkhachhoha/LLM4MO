@@ -4,7 +4,7 @@ class Paras():
         #####################
         ### General settings  ###
         #####################
-        self.method = 'eoh'
+        self.method = 'llmpareto'  # 'eoh', 'ael', 'llmpareto', 'reevo', 'ls', 'sa'
         self.problem = 'tsp_construct'
         self.selection = None
         self.management = None
@@ -56,14 +56,12 @@ class Paras():
     def set_ec(self):    
         
         if self.management == None:
-            if self.method in ['eoh']:
-                self.management = 'DDS'
+                self.management = 'FNDS'
         
         if self.selection == None:
-            self.selection = 'AST'
+            self.selection = 'FNDS'
             
         if self.ec_operators == None:
-            if self.method == 'eoh':
                 self.ec_operators  = ['e1','e2','m1','m2', 'm3']
 
         if self.ec_operator_weights == None:

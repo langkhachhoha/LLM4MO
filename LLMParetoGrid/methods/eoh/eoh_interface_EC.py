@@ -191,8 +191,6 @@ class InterfaceEC():
         try:
             results = Parallel(n_jobs=self.n_p,timeout=self.timeout+15)(delayed(self.get_offspring)(pop, operator) for _ in range(self.pop_size))
         except Exception as e:
-            if self.debug:
-                print(f"Error: {e}")
             print("Parallel time out .")
             
         time.sleep(2)
@@ -204,7 +202,5 @@ class InterfaceEC():
         for p, off in results:
             out_p.append(p)
             out_off.append(off)
-            if self.debug:
-                print(f">>> check offsprings: \n {off}")
         return out_p, out_off
 

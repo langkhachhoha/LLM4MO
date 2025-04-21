@@ -1,6 +1,6 @@
 
-from .selection import prob_rank,equal,roulette_wheel,tournament, AST
-from .management import pop_greedy,ls_greedy,ls_sa, DDS
+from .selection import FNDS, prob_rank,equal,roulette_wheel,tournament, AST, FNDS
+from .management import pop_greedy,ls_greedy,ls_sa, DDS, FNDS
 
 
 class Methods():
@@ -17,6 +17,8 @@ class Methods():
             self.select = tournament
         elif paras.selection == 'AST':
             self.select = AST
+        elif paras.selection == 'FNDS':
+            self.select = FNDS
         else:
             print("selection method "+paras.selection+" has not been implemented !")
             exit()
@@ -29,6 +31,8 @@ class Methods():
             self.manage = ls_sa
         elif paras.management == 'DDS':
             self.manage = DDS
+        elif paras.management == 'FNDS':
+            self.manage = FNDS
         else:
             print("management method "+paras.management+" has not been implemented !")
             exit()
@@ -39,7 +43,7 @@ class Methods():
         if self.paras.method == "ael":
             from .ael.ael import AEL
             return AEL(self.paras,self.problem,self.select,self.manage)
-        elif self.paras.method == "eoh":   
+        elif self.paras.method == "llmpareto":   
             from .eoh.eoh import EOH
             return EOH(self.paras,self.problem,self.select,self.manage)
         elif self.paras.method in ['ls','sa']:   

@@ -69,7 +69,7 @@ def calculate_crowding_distance(population, indices):
     return distances
 
 # ==== Step 4: Chọn đúng N cá thể ====
-def select_N_individuals(population, N):
+def population_management(population, N):
     fronts = fast_non_dominated_sort(population)
     selected = []
 
@@ -106,15 +106,7 @@ def plot_selected(population, selected_indices):
 if __name__ == "__main__":
     population = generate_mock_data(100)
     N = 30
-    selected_indices = select_N_individuals(population, N)
+    selected_indices = population_management(population, N)
+    print(population)
     plot_selected(population, selected_indices)
-
-
-
-
-
-
-
-
-
 

@@ -36,7 +36,7 @@ class Evolution():
     def get_prompt_i1(self):
         
         prompt_content = self.prompt_task+"\n"\
-"First, describe your new algorithm and main steps in one sentence. \
+"First, describe your new algorithm and main steps. \
 The description must be inside a brace. Next, implement it in Python as a function named \
 "+self.prompt_func_name +". This function should accept "+str(len(self.prompt_func_inputs))+" input(s): "\
 +self.joined_inputs+". The function should return "+str(len(self.prompt_func_outputs))+" output(s): "\
@@ -54,7 +54,7 @@ The description must be inside a brace. Next, implement it in Python as a functi
 "I have "+str(len(indivs))+" existing algorithms with their codes as follows: \n"\
 +prompt_indiv+\
 "Please help me create a new algorithm that has a totally different form from the given ones. \n"\
-"First, describe your new algorithm and main steps in one sentence. \
+"First, describe your new algorithm and main steps. \
 The description must be inside a brace. Next, implement it in Python as a function named \
 "+self.prompt_func_name +". This function should accept "+str(len(self.prompt_func_inputs))+" input(s): "\
 +self.joined_inputs+". The function should return "+str(len(self.prompt_func_outputs))+" output(s): "\
@@ -86,7 +86,7 @@ Algorithm description: "+indiv1['algorithm']+"\n\
 Code:\n\
 "+indiv1['code']+"\n\
 Please assist me in creating a new algorithm that has a different form but can be a modified version of the algorithm provided. \n"\
-"First, describe your new algorithm and main steps in one sentence. \
+"First, describe your new algorithm and main steps. \
 The description must be inside a brace. Next, implement it in Python as a function named \
 "+self.prompt_func_name +". This function should accept "+str(len(self.prompt_func_inputs))+" input(s): "\
 +self.joined_inputs+". The function should return "+str(len(self.prompt_func_outputs))+" output(s): "\
@@ -101,7 +101,7 @@ Algorithm description: "+indiv1['algorithm']+"\n\
 Code:\n\
 "+indiv1['code']+"\n\
 Please identify the main algorithm parameters and assist me in creating a new algorithm that has a different parameter settings of the score function provided. \n"\
-"First, describe your new algorithm and main steps in one sentence. \
+"First, describe your new algorithm and main steps. \
 The description must be inside a brace. Next, implement it in Python as a function named \
 "+self.prompt_func_name +". This function should accept "+str(len(self.prompt_func_inputs))+" input(s): "\
 +self.joined_inputs+". The function should return "+str(len(self.prompt_func_outputs))+" output(s): "\
